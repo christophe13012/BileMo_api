@@ -3,9 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -17,11 +20,13 @@ class User implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups("user:read")
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
+     * @Groups("user:read")
      */
     private $email;
 
@@ -33,8 +38,20 @@ class User implements UserInterface
     /**
      * @var string The hashed password
      * @ORM\Column(type="string")
+     * @Groups("user:read")
      */
     private $password;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     * @Groups("user:read")
+     */
+    private $client_id;
+
+    public function __construct()
+    {
+        $this->client = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -115,5 +132,17 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getClientId(): ?int
+    {
+        return $this->client_id;
+    }
+
+    public function setClientId(?int $client_id): self
+    {
+        $this->client_id = $client_id;
+
+        return $this;
     }
 }
